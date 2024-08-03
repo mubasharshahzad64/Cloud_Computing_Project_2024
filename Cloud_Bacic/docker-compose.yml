@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb
+    container_name: nextcloud_mariadb1
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=14070929
+      - MYSQL_DATABASE=nextcloud1
+      - MYSQL_USER=nextcloud1
+      - MYSQL_PASSWORD=14070929
+    networks:
+      - nextcloud_network
+
+  app:
+    image: nextcloud
+    restart: always
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=nextcloud1
+      - MYSQL_USER=nextcloud1
+      - MYSQL_PASSWORD=14070929
+    networks:
+      - nextcloud_network
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+
+volumes:
+  db:
+
+networks:
+  nextcloud_network:
