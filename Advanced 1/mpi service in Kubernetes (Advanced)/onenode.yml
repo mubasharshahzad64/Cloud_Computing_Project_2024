@@ -1,0 +1,32 @@
+apiVersion: kubeflow.org/v1alpha2
+kind: MPIJob
+metadata:
+  name: osu-benchmark
+spec:
+  slotsPerWorker: 1
+  cleanPodPolicy: Running
+  mpiReplicaSpecs:
+    Launcher:
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: mpi-launcher
+              image: <your-dockerhub-username>/osu-benchmark:latest
+              command: ["mpirun"]
+              args: ["-n", "2", "-hostfile", "/etc/mpi/hostfile", "./pt2pt/osu_latency"]
+              resources:
+                limits:
+                  cpu: 1
+                  memory: 1Gi
+    Worker:
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: mpi-worker
+              image: <your-dockerhub-username>/osu-benchmark:latest
+              resources:
+                limits:
+                  cpu: 1
+                  memory: 1Gi
