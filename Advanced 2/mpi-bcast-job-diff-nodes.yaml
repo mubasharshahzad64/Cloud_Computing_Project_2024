@@ -1,0 +1,41 @@
+apiVersion: kubeflow.org/v1
+kind: MPIJob
+metadata:
+  name: mpi-bcast-job-diff-nodes
+spec:
+  slotsPerWorker: 1
+  mpiReplicaSpecs:
+    Launcher:
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - image: mpioperator/mpi-base:latest
+              name: mpi-launcher
+              command: ["mpirun"]
+              args: ["-np", "2", "-ppn", "1", "/usr/local/libexec/osu-micro-benchmarks/mpi/collective/osu_bcast"]
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: "2Gi"
+    Worker:
+      replicas: 2
+      template:
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: mpi-bcast-job
+                        operator: In
+                        values:
+                          - mpi-worker
+                  topologyKey: "kubernetes.io/hostname"
+          containers:
+            - image: mpioperator/mpi-base:latest
+              name: mpi-worker
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: "2Gi"
