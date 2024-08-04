@@ -1,149 +1,84 @@
-# OSU MPI Benchmarks on Kubernetes
+# MPI Benchmarking on Kubernetes
 
-This repository contains the implementation of the OSU MPI Benchmarks on a Kubernetes cluster using the Kubeflow MPI Operator. The objective of this project was to measure the MPI latency and visualize the results.
+## Overview
+This project demonstrates the deployment and execution of MPI benchmarks on a Kubernetes cluster. The benchmarks include point-to-point and broadcast latencies measured using the OSU Micro-Benchmarks suite. The setup utilizes Minikube for creating a local Kubernetes cluster and the MPI Operator to manage MPI jobs.
 
 ## Table of Contents
-
-- [Introduction](#introduction)
-- [Prerequisites](#prerequisites)
-- [Setup Instructions](#setup-instructions)
-  - [Setting Up the Environment](#setting-up-the-environment)
-  - [Building and Pushing Docker Image](#building-and-pushing-docker-image)
-  - [Deploying Resources on Kubernetes](#deploying-resources-on-kubernetes)
-  - [Setting Up MPI Operator](#setting-up-mpi-operator)
-- [Running the Benchmarks](#running-the-benchmarks)
+- [Overview](#overview)
+- [Environment Setup](#environment-setup)
+- [Implementation](#implementation)
+  - [Deployment Configuration](#deployment-configuration)
+  - [MPI Job Configuration](#mpi-job-configuration)
 - [Results](#results)
+  - [Point-to-Point Latency](#point-to-point-latency)
+  - [Broadcast Latency](#broadcast-latency)
+- [Challenges and Difficulties](#challenges-and-difficulties)
 - [Conclusion](#conclusion)
-- [Challenges Faced](#challenges-faced)
-- [Key Takeaways](#key-takeaways)
 
-## Introduction
+## Environment Setup
+To set up the environment, follow these steps:
 
-This project documents the implementation of the OSU MPI Benchmarks on a Kubernetes cluster. The benchmarks are used to measure the latency of MPI communications. The process involves setting up a Kubernetes cluster, deploying the necessary resources, running the benchmarks, and interpreting the results.
-
-## Prerequisites
-
-- Docker
-- Minikube
-- kubectl
-- Python with Matplotlib
-
-## Setup Instructions
-
-### Setting Up the Environment
-
-1. **Install Minikube**
-
-    ```sh
-    curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-    chmod +x minikube
-    sudo mv minikube /usr/local/bin/
-    minikube start --driver=docker
+1. **Start Minikube with appropriate resources:**
+    ```bash
+    minikube start --cpus=4 --memory=8192
     ```
 
-2. **Install kubectl**
-
-    ```sh
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    chmod +x kubectl
-    sudo mv kubectl /usr/local/bin/
-    kubectl version --client
-    ```
-
-### Building and Pushing Docker Image
-
-1. **Build Docker image**
-
-    ```sh
-    docker build -t <your-dockerhub-username>/osu-benchmarks .
-    ```
-
-2. **Push Docker image to Docker Hub**
-
-    ```sh
-    docker push <your-dockerhub-username>/osu-benchmarks
-    ```
-
-### Deploying Resources on Kubernetes
-
-1. **Create necessary directories**
-
-    ```sh
-    mkdir -p ~/cloud-advance-project/k8s-manifests
-    ```
-
-2. **Save the deployment YAML files**
-
-    - `osu-benchmarks-deployment.yaml`
-    - `osu-benchmarks-mpijob.yaml`
-
-3. **Apply the YAML files**
-
-    ```sh
-    kubectl apply -f ~/cloud-advance-project/k8s-manifests/osu-benchmarks-deployment.yaml
-    kubectl apply -f ~/cloud-advance-project/k8s-manifests/osu-benchmarks-mpijob.yaml
-    ```
-
-### Setting Up MPI Operator
-
-1. **Clone the MPI Operator repository**
-
-    ```sh
+2. **Clone the MPI Operator repository:**
+    ```bash
     git clone https://github.com/kubeflow/mpi-operator.git
     cd mpi-operator
     ```
 
-2. **Checkout a stable version**
-
-    ```sh
+3. **Checkout a stable version of the MPI Operator:**
+    ```bash
     git checkout v0.3.0
     ```
 
-3. **Apply the MPI Operator YAML**
-
-    ```sh
+4. **Apply the MPI Operator YAML to create necessary resources:**
+    ```bash
     kubectl apply -f deploy/v2beta1/mpi-operator.yaml
     ```
 
-## Running the Benchmarks
-
-1. **Submit the MPI job**
-
-    ```sh
-    kubectl apply -f ~/cloud-advance-project/k8s-manifests/osu-benchmarks-mpijob.yaml
+5. **Verify that MPI Operator pods are running:**
+    ```bash
+    kubectl get pods -n mpi-operator
     ```
 
-2. **Check the status of the MPI job**
+## Implementation
 
-    ```sh
-    kubectl get mpijobs
-    kubectl get pods
+### Deployment Configuration
+The deployment configuration is specified in the `osu-benchmarks-deployment.yaml` file. This configuration sets up the necessary Kubernetes resources to run the MPI benchmarks.
+
+### MPI Job Configuration
+Two MPI job configurations are provided:
+- `osu-benchmarks-mpijob.yaml`: For point-to-point latency measurement.
+- `mpi-bcast-job-diff-nodes.yaml`: For broadcast latency measurement.
+
+### Example YAML Files
+- **osu-benchmarks-deployment.yaml**
+    ```yaml
+    # YAML content here
     ```
 
-3. **View the logs**
+- **osu-benchmarks-mpijob.yaml**
+    ```yaml
+    # YAML content here
+    ```
 
-    ```sh
-    kubectl logs <launcher-pod-name>
+- **mpi-bcast-job-diff-nodes.yaml**
+    ```yaml
+    # YAML content here
     ```
 
 ## Results
 
-After running the OSU MPI Benchmarks, the latency results were obtained and plotted using the following Python script:
-
-```python
-import matplotlib.pyplot as plt
-
-# Data
-sizes = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304]
-latencies = [4.77, 4.91, 4.90, 4.89, 4.90, 5.17, 4.91, 5.00, 4.97, 4.98, 3.76, 7.90, 0.76, 5.04, 8.69, 42.89, 6.28, 47.14, 144.97, 348.78, 500.44, 1550.27, 3195.43, 6453.01]
-
-# Plot
-plt.figure(figsize=(10, 6))
-plt.plot(sizes, latencies, marker='o')
-plt.xscale('log')
-plt.yscale('log')
-plt.xlabel('Message Size (Bytes)')
-plt.ylabel('Latency (us)')
-plt.title('OSU MPI Latency Test')
-plt.grid(True, which="both", ls="--")
-plt.show()
+### Point-to-Point Latency
+The point-to-point latency was measured using the OSU MPI Latency Test. The results are as follows:
+```plaintext
+# OSU MPI Latency Test v5.7.1
+# Size          Latency (us)
+0               4.77
+1               4.91
+2               4.90
+...
+4194304      6453.01
