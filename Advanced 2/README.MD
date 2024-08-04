@@ -147,13 +147,20 @@ plt.ylabel('Latency (us)')
 plt.title('OSU MPI Latency Test')
 plt.grid(True, which="both", ls="--")
 plt.show()
+```
 ## Conclusion
+```
 In this project, we successfully deployed OSU MPI Benchmarks on a Kubernetes cluster using the Kubeflow MPI Operator. The benchmarks provided detailed latency measurements for different message sizes.
+```
 ## Challenges Faced
+```
 Configuring the Kubernetes cluster and ensuring all dependencies were properly installed.
 Dealing with resource allocation issues, such as insufficient CPU availability on the Minikube node.
 Resolving issues related to CRD (Custom Resource Definitions) for MPI jobs.
+```
 ## Key Takeaways
+```
 Kubernetes, combined with Kubeflow, provides a powerful platform for running MPI workloads.
 Proper resource allocation and management are crucial for the successful execution of high-performance computing tasks.
 Visualizing performance metrics helps in understanding the efficiency and bottlenecks of MPI implementations.
+```
