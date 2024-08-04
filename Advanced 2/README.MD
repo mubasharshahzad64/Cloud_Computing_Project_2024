@@ -135,7 +135,7 @@ Choose and install a networking plugin for Kubernetes (Flannel or Calico).
           spec:
             containers:
             - name: mpi-launcher
-              image: your-dockerhub-username/osu-benchmarks
+              image: mubasharshahzad/osu-benchmarks
               command: ["/bin/bash", "-c"]
               args: ["mpirun -np 2 ./osu_latency"]
         Worker:
@@ -143,7 +143,7 @@ Choose and install a networking plugin for Kubernetes (Flannel or Calico).
           spec:
             containers:
             - name: mpi-worker
-              image: your-dockerhub-username/osu-benchmarks
+              image: mubasharshahzad/osu-benchmarks
     ```
 
 2. **Deploy MPI Job**
