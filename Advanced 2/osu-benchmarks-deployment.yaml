@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osu-benchmarks
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: osu-benchmarks
+  template:
+    metadata:
+      labels:
+        app: osu-benchmarks
+    spec:
+      containers:
+      - name: osu-benchmarks
+        image: mubasharshahzad/osu-benchmarks
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+

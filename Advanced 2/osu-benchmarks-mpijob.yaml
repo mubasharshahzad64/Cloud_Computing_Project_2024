@@ -1,0 +1,37 @@
+apiVersion: kubeflow.org/v1
+kind: MPIJob
+metadata:
+  name: osu-benchmarks
+spec:
+  slotsPerWorker: 1
+  cleanPodPolicy: Running
+  mpiReplicaSpecs:
+    Launcher:
+      replicas: 1
+      template:
+        spec:
+          containers:
+          - name: mpi-operator
+            image: mubasharshahzad/osu-benchmarks
+            resources:
+              requests:
+                cpu: "250m"
+                memory: "512Mi"
+              limits:
+                cpu: "500m"
+                memory: "1Gi"
+    Worker:
+      replicas: 2
+      template:
+        spec:
+          containers:
+          - name: mpi-operator
+            image: mubasharshahzad/osu-benchmarks
+            resources:
+              requests:
+                cpu: "250m"
+                memory: "512Mi"
+              limits:
+                cpu: "500m"
+                memory: "1Gi"
+
