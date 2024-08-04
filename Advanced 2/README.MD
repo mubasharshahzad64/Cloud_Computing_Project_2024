@@ -222,10 +222,5 @@ Choose and install a networking plugin for Kubernetes (Flannel or Calico).
     python3 plot_latency.py
     ```
 
-## Conclusion
-
-You have successfully set up a Kubernetes cluster, installed the MPI Operator, created a Docker container with the OSU benchmark, and deployed an MPI job to measure latency. You also compared latencies for different pod placements and visualized the results using Python.
-
-Feel free to adjust any configurations or paths as necessary for your environment.
 
 
